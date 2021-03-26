@@ -1,29 +1,38 @@
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Tasks from "./components/Tasks";
-import { useState } from "react";
 import AddTask from "./components/AddTask";
 
 function App() {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      text: "Food Shopping1",
-      day: "Feb 5th at 2:30pm",
-      reminder: true,
-    },
-    {
-      id: 2,
-      text: "Food Shopping2",
-      day: "Feb 5th at 2:30pm",
-      reminder: false,
-    },
-    {
-      id: 3,
-      text: "Food Shopping3",
-      day: "Feb 5th at 2:30pm",
-      reminder: false,
-    },
-  ]);
+  // This is similar to action and reducer, name and event to use to update state
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [tasks, setTasks] = useState([]);
+
+  // useEffect used when you need something to happen when page loads
+  useEffect(() => {
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks();
+      setTasks(tasksFromServer);
+    };
+
+    getTasks();
+    // Dependency array [] below, like if you have user and user changes you would use [user]
+  }, []);
+
+  // Fetch data
+  const fetchTasks = async () => {
+    const res = await fetch("http://localhost:5000/tasks");
+    const data = await res.json();
+
+    return data;
+  };
+
+  // Add Task
+  const addTask = (task) => {
+    const id = Math.floor(Math.random() * 10000) + 1;
+    const newTask = { id, ...task };
+    setTasks([...tasks, newTask]);
+  };
 
   // Delete Task
   const deleteTask = (id) => {
@@ -41,8 +50,11 @@ function App() {
 
   return (
     <div className="container">
-      <Header />
-      <AddTask />
+      <Header
+        onAdd={() => setShowAddTask(!showAddTask)}
+        showAdd={showAddTask}
+      />
+      {showAddTask && <AddTask onAdd={addTask} />}
       {tasks.length > 0 ? (
         <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} />
       ) : (
