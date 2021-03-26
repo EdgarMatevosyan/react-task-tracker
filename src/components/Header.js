@@ -3,10 +3,13 @@ import Button from "./Button";
 import { useLocation } from "react-router-dom";
 
 const Header = ({ title, onAdd, showAdd }) => {
+  // Use location to disable certain elements on certain pages ie ADD button on About page
   const location = useLocation();
+
   return (
     <header className="header">
       <h1>{title}</h1>
+      {/* Use location to disable certain elements on certain pages ie ADD button on About page */}
       {location.pathname === "/" && (
         <Button
           color={showAdd ? "red" : "green"}
